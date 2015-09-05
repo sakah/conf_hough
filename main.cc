@@ -78,8 +78,8 @@ int main(int argc, char** argv)
          TMarker* m1 = getMarker(iturn, mcPos.X(), mcPos.Y());
          TMarker* m2 = getMarker(iturn, w_x1, w_y1);
 
-         c1->cd(1); m1->Draw();
-         c1->cd(2); m2->Draw();
+         c1->cd(); m1->Draw();
+         c2->cd(); m2->Draw();
 
          printf("iev %d MC:  ihit %d (%f, %f, %f)\n", iev, ihit, mcPos.X(), mcPos.Y(), mcPos.Z());
          printf("iev %d End: ihit %d (%f, %f, %f) - (%f, %f, %f)\n", iev, ihit, w_x1, w_y1, w_z1, w_x2, w_y2, w_z2);

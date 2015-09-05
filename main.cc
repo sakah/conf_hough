@@ -39,6 +39,7 @@ int main(int argc, char** argv)
    TCanvas* c1 = new TCanvas("c1");
    TH2F* h2 = new TH2F("h2", "", 100, -100, 100, 100, -100, 100);
    for (int iev=0; iev<total; iev++) {
+      h2->SetTitle(Form("iev %d", iev));
       h2->Draw();
       inROOT.getEntry(iev);
       bool directHit = inROOT.InDirectHitAtTriggerCounter();

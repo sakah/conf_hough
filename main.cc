@@ -36,7 +36,7 @@ int main(int argc, char** argv)
    double mc_px;
    double mc_py;
    double mc_pz;
-   TCanvas* c1 = new TCanvas("c1");
+   TCanvas* c1 = new TCanvas("c1","", 500, 500);
    TH2F* h2 = new TH2F("h2", "", 100, -100, 100, 100, -100, 100);
    for (int iev=0; iev<total; iev++) {
       h2->SetTitle(Form("iev %d", iev));

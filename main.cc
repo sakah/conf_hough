@@ -37,7 +37,7 @@ int main(int argc, char** argv)
    double mc_py;
    double mc_pz;
    TCanvas* c1 = new TCanvas("c1");
-   TH2F* h2 = new TH2F("h2", "", 100, -50, 50, 100, -50, 50);
+   TH2F* h2 = new TH2F("h2", "", 100, -100, 100, 100, -100, 100);
    for (int iev=0; iev<total; iev++) {
       h2->Draw();
       inROOT.getEntry(iev);

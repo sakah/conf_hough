@@ -51,17 +51,19 @@ int main(int argc, char** argv)
    TVector3 mcPos;
    TVector3 mcMom;
 
-   TCanvas* c1 = new TCanvas("c1","", 1000, 1000);
-   c1->Divide(2, 2);
+   TCanvas* c1 = new TCanvas("c1","", 500*3, 500*2);
+   c1->Divide(3,2);
 
    TH2F* h1 = new TH2F("h1", "", 100, -100, 100, 100, -100, 100);
    TH2F* h2 = new TH2F("h2", "", 100, -100, 100, 100, -100, 100);
    TH2F* h3 = new TH2F("h3", "", 100, -100, 100, 100, -100, 100);
    TH2F* h4 = new TH2F("h4", "", 100, 0, 200, 100, -150, 150);
+   TH2F* h5 = new TH2F("h5", "", 100, 0, 200, 100, -150, 150); // MeV
    h1->SetStats(0);
    h2->SetStats(0);
    h3->SetStats(0);
    h4->SetStats(0);
+   h5->SetStats(0);
 
    for (int iev=0; iev<total; iev++) {
 
@@ -69,6 +71,7 @@ int main(int argc, char** argv)
       h2->SetTitle(Form("iev %d - Wire XY @ endplate", iev)); c1->cd(2); h2->Draw();
       h3->SetTitle(Form("iev %d - Wire XY @ hitZ", iev)); c1->cd(3); h3->Draw();
       h4->SetTitle(Form("iev %d - MC Z vs ihit", iev)); c1->cd(4); h4->Draw();
+      h5->SetTitle(Form("iev %d - MC PZ vs ihit", iev)); c1->cd(5); h5->Draw();
 
       inROOT.getEntry(iev);
       bool directHit = inROOT.InDirectHitAtTriggerCounter();
@@ -89,11 +92,13 @@ int main(int argc, char** argv)
          TMarker* m2 = getMarker(iturn, w_x1, w_y1);
          TMarker* m3 = getMarker(iturn, w_x, w_y);
          TMarker* m4 = getMarker(iturn, ihit, mcPos.Z());
+         TMarker* m5 = getMarker(iturn, ihit, mcPos.Pz());
 
          c1->cd(1); m1->Draw();
          c1->cd(2); m2->Draw();
          c1->cd(3); m3->Draw();
          c1->cd(4); m4->Draw();
+         c1->cd(5); m5->Draw();
 
          printf("iev %d MC:     ihit %d (%f, %f, %f)\n", iev, ihit, mcPos.X(), mcPos.Y(), mcPos.Z());
          printf("iev %d End:    ihit %d (%f, %f, %f) - (%f, %f, %f)\n", iev, ihit, w_x1, w_y1, w_z1, w_x2, w_y2, w_z2);

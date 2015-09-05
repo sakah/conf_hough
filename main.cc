@@ -92,7 +92,7 @@ int main(int argc, char** argv)
          TMarker* m2 = getMarker(iturn, w_x1, w_y1);
          TMarker* m3 = getMarker(iturn, w_x, w_y);
          TMarker* m4 = getMarker(iturn, ihit, mcPos.Z());
-         TMarker* m5 = getMarker(iturn, ihit, mcPos.Pz());
+         TMarker* m5 = getMarker(iturn, ihit, mcMom.Z());
 
          c1->cd(1); m1->Draw();
          c1->cd(2); m2->Draw();

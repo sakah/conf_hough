@@ -52,7 +52,7 @@ int main(int argc, char** argv)
    TVector3 mcMom;
 
    TCanvas* c1 = new TCanvas("c1","", 1000, 500);
-   c1->Divide(2, 1);
+   c1->Divide(2, 2);
 
    TH2F* h1 = new TH2F("h1", "", 100, -100, 100, 100, -100, 100);
    TH2F* h2 = new TH2F("h2", "", 100, -100, 100, 100, -100, 100);

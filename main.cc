@@ -44,7 +44,11 @@ int main(int argc, char** argv)
       inROOT.getEntry(iev);
       bool directHit = inROOT.InDirectHitAtTriggerCounter();
       if (!directHit) continue;
+
       int numHits = inROOT.getNumHits();
+      if (numHits==0) continue;
+
+      printf("iev %d numHits %d\n", iev, numHits );
       for (int ihit=0; ihit<numHits; ihit++) {
          inROOT.getWirePosAtEndPlates(ihit, w_x1, w_y1, w_z1, w_x2, w_y2, w_z2);
          TMarker *m1 = new TMarker(w_x1, w_y1, 20);

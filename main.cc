@@ -57,7 +57,7 @@ int main(int argc, char** argv)
    TH2F* h1 = new TH2F("h1", "", 100, -100, 100, 100, -100, 100);
    TH2F* h2 = new TH2F("h2", "", 100, -100, 100, 100, -100, 100);
    TH2F* h3 = new TH2F("h3", "", 100, -100, 100, 100, -100, 100);
-   TH2F* h4 = new TH2F("h4", "", 100, -100, 100, 100, -100, 100);
+   TH2F* h4 = new TH2F("h4", "", 100, 0, 200, 100, -150, 150);
    h1->SetStats(0);
    h2->SetStats(0);
    h3->SetStats(0);

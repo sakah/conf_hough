@@ -38,6 +38,7 @@ int main(int argc, char** argv)
    double mc_pz;
    TCanvas* c1 = new TCanvas("c1","", 500, 500);
    TH2F* h2 = new TH2F("h2", "", 100, -100, 100, 100, -100, 100);
+   h2->SetStats(0);
    for (int iev=0; iev<total; iev++) {
       h2->SetTitle(Form("iev %d", iev));
       h2->Draw();
@@ -51,7 +52,13 @@ int main(int argc, char** argv)
       printf("iev %d numHits %d\n", iev, numHits );
       for (int ihit=0; ihit<numHits; ihit++) {
          inROOT.getWirePosAtEndPlates(ihit, w_x1, w_y1, w_z1, w_x2, w_y2, w_z2);
-         TMarker *m1 = new TMarker(w_x1, w_y1, 20);
+         int iturn = inROOT.getIturn(ihit);
+         TMarker *m1 = new TMarker(w_x1, w_y1, 5);
+         m1->SetMarkerColor(1);
+         if (iturn==0) m1->SetMarkerColor(2);
+         if (iturn==1) m1->SetMarkerColor(3);
+         if (iturn==2) m1->SetMarkerColor(4);
+         if (iturn==3) m1->SetMarkerColor(5);
          m1->Draw();
          printf("iev %d ihit %d (%f, %f, %f) - (%f, %f, %f)\n", iev, ihit, w_x1, w_y1, w_z1, w_x2, w_y2, w_z2);
       }

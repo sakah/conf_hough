@@ -73,12 +73,12 @@ struct Hough
    };
    void transform(MyHits& hits)
    {
-      double astep = 0.01;
+      double astep = 0.1;
       double amin = -10;
       double amax = 10;
       double bstep = 0.001;
-      double bmin = -0.1;
-      double bmax = 0.1;
+      double bmin = -0.05;
+      double bmax = 0.05;
       int anum = (amax-amin)/astep;
       int bnum = (bmax-bmin)/bstep;
       //printf("anum %d %f %f bnum %d %f %f\n", anum, amin, amax, bnum, bmin, bmax);
@@ -354,7 +354,7 @@ int main(int argc, char** argv)
 
       c2.add_h2d(0,"h101", "Wire XY@z", 100, -100, 100, 100, -100, 100);
       c2.add_h2d(1,"h102", "Conf UV@z", 100, -1e-1, 1e-1, 100, -1e-1, 1e-1);
-      c2.add_h1d(2,"h103", "Diff", 100, -1e-1, 1e-1);
+      c2.add_h1d(2,"h103", "Diff", 100, -0.02, 0.02);
 
       struct Hough hough;
       int max_num = 0;
@@ -396,7 +396,7 @@ int main(int argc, char** argv)
             c2.cd(2); hough.get_line()->Draw("same");
             c2.cd(3); c2.h1d[0]->Draw();
             c2.cd(4); hough.h2->Draw("colz");
-            c2.print(Form("pdf/hough/%05d-%d-%d.png", iev,iz1,iz2));
+            c2.print(Form("pdf/hough/%05d-%d-%d.pdf", iev,iz1,iz2));
          }
       }
       printf("iev %d num_hits %d max_num %d max_z1 %f max_z2 %f\n", iev, hough.num_hits, max_num, max_z1, max_z2);

@@ -122,11 +122,11 @@ struct Canvas
    {
       char title[128];
       for (int i=0; i<num_h1d; i++) {
-         sprintf(title, "%s %s", prefix, h1d[i]->GetTitle());
+         sprintf(title, "%s %s", prefix, h1name[i]);
          h1d[i]->SetTitle(title);
       }
       for (int i=0; i<num_h2d; i++) {
-         sprintf(title, "%s %s", prefix, h2d[i]->GetTitle());
+         sprintf(title, "%s %s", prefix, h2name[i]);
          h2d[i]->SetTitle(title);
       }
    };
@@ -208,7 +208,7 @@ int main(int argc, char** argv)
    for (int iev=0; iev<total; iev++) {
 
       sprintf(title, "iev %d ", iev);
-      //c1.update_title_prefix(title);
+      c1.update_title_prefix(title);
       c1.draw_hists();
 
       inROOT.getEntry(iev);

@@ -73,8 +73,8 @@ struct Canvas
    int num_h2d;
    TH1F* h1d[1000];
    TH2F* h2d[1000];
-   char* h1name[1000];
-   char* h2name[1000];
+   char h1name[100][1000];
+   char h2name[100][1000];
    int h1idx[1000];
    int h2idx[1000];
    void init(int _nx, int _ny)
@@ -94,7 +94,8 @@ struct Canvas
    {
       h1d[num_h1d] = new TH1F(hname, "", nx, xmin, xmax);
       h1d[num_h1d]->SetStats(0);
-      h1name[num_h1d] = htitle;
+      h1d[num_h1d]->SetStats(0);
+      strcpy(h1name[num_h1d], htitle);
       h1idx[num_h1d] = idx;
       num_h1d++;
    };
@@ -102,9 +103,20 @@ struct Canvas
    {
       h2d[num_h2d] = new TH2F(hname, "", nx, xmin, xmax, ny, ymin, ymax);
       h2d[num_h2d]->SetStats(0);
-      h2name[num_h2d] = htitle;
+      strcpy(h2name[num_h2d], htitle);
       h2idx[num_h2d] = idx;
       num_h2d++;
+   };
+   void debug()
+   {
+      printf("num_h1d %d\n", num_h1d);
+      for (int i=0; i<num_h1d; i++) {
+         printf("i %d h1idx %d h1name %s\n", i, h1idx[i], h1name[i]);
+      }
+      printf("num_h2d %d\n", num_h2d);
+      for (int i=0; i<num_h2d; i++) {
+         printf("i %d h2idx %d h2name %s\n", i, h2idx[i], h2name[i]);
+      }
    };
    void update_title_prefix(char* prefix)
    {
@@ -122,11 +134,11 @@ struct Canvas
    {
       for (int i=0; i<nx*ny; i++) {
          c1->cd(i+1);
-         for (int i=0; i<num_h1d; i++) {
-            if (h1idx[i]==i) h1d[i]->Draw();
+         for (int j=0; j<num_h1d; j++) {
+            if (h1idx[j]==i) h1d[j]->Draw();
          }
-         for (int i=0; i<num_h2d; i++) {
-            if (h2idx[i]==i) h2d[i]->Draw();
+         for (int j=0; i<num_h2d; i++) {
+            if (h2idx[j]==i) h2d[j]->Draw();
          }
       }
    };
@@ -190,6 +202,7 @@ int main(int argc, char** argv)
    c1.add_h2d(16, "h53", "EVEN - MC Z vs ihit XY", 100, 0, 200, 100, -150, 150);
    c1.add_h2d(17, "h63", "EVEN - MC PZ vs ihit", 100, 0, 200, 100, -150, 150); // MeV
 
+   c1.debug();
 
    char title[12];
    for (int iev=0; iev<total; iev++) {

@@ -100,7 +100,7 @@ struct Hough
       for (int ihit=0; ihit<num_hits; ihit++) {
          double v = found_a * hits.uhits[ihit] + found_b;
          double diff = v - hits.vhits[ihit];
-         printf("ihit %d vcalc %f vhits %f diff %f\n", ihit, v, hits.vhits[ihit], diff);
+         //printf("ihit %d vcalc %f vhits %f diff %f\n", ihit, v, hits.vhits[ihit], diff);
          if (TMath::Abs(diff) < 0.05) {
             num_inside++;
          }
@@ -342,11 +342,8 @@ int main(int argc, char** argv)
       int max_num = 0;
       double max_z1 = 0;
       double max_z2 = 0;
-      //      for (int iz1=0; iz1<100; iz1++) {
-      //         for (int iz2=0; iz2<100; iz2++) {
-      //      for (int iz1=60; iz1<61; iz1++) {
-      for (int iz1=0; iz1<1; iz1++) {
-         for (int iz2=90; iz2<91; iz2++) {
+      for (int iz1=0; iz1<100; iz1++) {
+         for (int iz2=0; iz2<100; iz2++) {
 
             double z1 = iz1 - 50.0;
             double z2 = iz2 - 50.0;

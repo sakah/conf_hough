@@ -8,6 +8,45 @@
 #include "TMarker.h"
 #include "InputROOT.h"
 
+/*
+struct Hough
+{
+   TH2F* h2;
+   double found_a;
+   double found_b;
+   void transform()
+   {
+      double astep = 0.1;
+      double bstep = 0.1;
+      double amin = 0;
+      double bmin = 0;
+      double amax = 10;
+      double bmax = 10;
+      int anum = (amax-amin)/astep;
+      int bnum = (bmax-bmin)/bstep;
+      printf("anum %d\n", anum);
+      h2 = new TH2F("h2","",anum, amin, amax, bnum, bmin, bmax);
+
+      for (int i=0; i<100; i++) {
+         for (int ia=0; ia<anum; ia++) {
+
+            double a = ia*astep + amin;
+            double b = -xhits[i]*a + yhits[i];
+
+            //printf("i %d a %lf b %lf\n", i, a, b);
+            h2->Fill(a, b, 1);
+         }
+      }
+      int ia_min;
+      int ib_min;
+      int tmp;
+      h2->GetMaximumBin(ia_min, ib_min, tmp);
+      found_a = h2->GetXaxis()->GetBinCenter(ia_min);
+      found_b = h2->GetYaxis()->GetBinCenter(ib_min);
+   };
+};
+*/
+
 TMarker* getMarker(int ilayer, int iturn, double x, double y)
 {
    TMarker *m1 = new TMarker(x, y, 8);
@@ -24,6 +63,78 @@ TMarker* getMarker(int ilayer, int iturn, double x, double y)
 
    return m1;
 }
+
+struct Canvas
+{
+   TCanvas* c1;
+   int nx;
+   int ny;
+   int num_h1d;
+   int num_h2d;
+   TH1F* h1d[1000];
+   TH2F* h2d[1000];
+   char* h1name[1000];
+   char* h2name[1000];
+   int h1idx[1000];
+   int h2idx[1000];
+   void init(int _nx, int _ny)
+   {
+      c1 = new TCanvas("c1","", 500*nx, 500*ny);
+      c1->Divide(nx,ny);
+      nx = _nx;
+      ny = _ny;
+      num_h1d = 0;
+      num_h2d = 0;
+   };
+   void cd(int idx)
+   {
+      c1->cd(idx);
+   };
+   void add_h1d(int idx, char* hname, char* htitle, int nx, double xmin, double xmax)
+   {
+      h1d[num_h1d] = new TH1F(hname, "", nx, xmin, xmax);
+      h1d[num_h1d]->SetStats(0);
+      h1name[num_h1d] = htitle;
+      h1idx[num_h1d] = idx;
+      num_h1d++;
+   };
+   void add_h2d(int idx, char* hname, char* htitle, int nx, double xmin, double xmax, int ny, double ymin, double ymax)
+   {
+      h2d[num_h2d] = new TH2F(hname, "", nx, xmin, xmax, ny, ymin, ymax);
+      h2d[num_h2d]->SetStats(0);
+      h2name[num_h2d] = htitle;
+      h2idx[num_h2d] = idx;
+      num_h2d++;
+   };
+   void update_title_prefix(char* prefix)
+   {
+      char title[128];
+      for (int i=0; i<num_h1d; i++) {
+         sprintf(title, "%s %s", prefix, h1d[i]->GetTitle());
+         h1d[i]->SetTitle(title);
+      }
+      for (int i=0; i<num_h2d; i++) {
+         sprintf(title, "%s %s", prefix, h2d[i]->GetTitle());
+         h2d[i]->SetTitle(title);
+      }
+   };
+   void draw_hists()
+   {
+      for (int i=0; i<nx*ny; i++) {
+         c1->cd(i+1);
+         for (int i=0; i<num_h1d; i++) {
+            if (h1idx[i]==i) h1d[i]->Draw();
+         }
+         for (int i=0; i<num_h2d; i++) {
+            if (h2idx[i]==i) h2d[i]->Draw();
+         }
+      }
+   };
+   void print(char* pdf_name)
+   {
+      c1->Print(pdf_name);
+   };
+};
 int main(int argc, char** argv)
 {
    if (argc != 8) {
@@ -55,89 +166,37 @@ int main(int argc, char** argv)
    TVector3 mcPos;
    TVector3 mcMom;
 
-   TCanvas* c1 = new TCanvas("c1","", 500*6, 500*3);
-   c1->Divide(6,3);
+   Canvas c1;
+   c1.init(6, 3);
 
-   TH2F* h11 = new TH2F("h11", "", 100, -100, 100, 100, -100, 100);
-   TH2F* h21 = new TH2F("h21", "", 100, -100, 100, 100, -100, 100);
-   TH2F* h31 = new TH2F("h31", "", 100, -1e-1, 1e-1, 100, -1e-1, 1e-1);
-   TH2F* h41 = new TH2F("h41", "", 100, -100, 100, 100, -100, 100);
-   TH2F* h51 = new TH2F("h51", "", 100, 0, 200, 100, -150, 150);
-   TH2F* h61 = new TH2F("h61", "", 100, 0, 200, 100, -150, 150); // MeV
+   c1.add_h2d(0, "h11", "ODD - MC XY", 100, -100, 100, 100, -100, 100);
+   c1.add_h2d(1, "h21", "ODD - Wire XY@endplate", 100, -100, 100, 100, -100, 100);
+   c1.add_h2d(2, "h31", "ODD - Conformal XY@endplate", 100, -1e-1, 1e-1, 100, -1e-1, 1e-1);
+   c1.add_h2d(3, "h41", "ODD - Wire XY @hitz", 100, -100, 100, 100, -100, 100);
+   c1.add_h2d(4, "h51", "ODD - MC Z vs ihit XY", 100, 0, 200, 100, -150, 150);
+   c1.add_h2d(5, "h61", "ODD - MC PZ vs ihit", 100, 0, 200, 100, -150, 150); // MeV
 
-   TH2F* h12 = new TH2F("h12", "", 100, -100, 100, 100, -100, 100);
-   TH2F* h22 = new TH2F("h22", "", 100, -100, 100, 100, -100, 100);
-   TH2F* h32 = new TH2F("h32", "", 100, -1e-1, 1e-1, 100, -1e-1, 1e-1);
-   TH2F* h42 = new TH2F("h42", "", 100, -100, 100, 100, -100, 100);
-   TH2F* h52 = new TH2F("h52", "", 100, 0, 200, 100, -150, 150);
-   TH2F* h62 = new TH2F("h62", "", 100, 0, 200, 100, -150, 150); // MeV
+   c1.add_h2d(6, "h12", "EVEN - MC XY", 100, -100, 100, 100, -100, 100);
+   c1.add_h2d(7, "h22", "EVEN - Wire XY@endplate", 100, -100, 100, 100, -100, 100);
+   c1.add_h2d(8, "h32", "EVEN - Conformal XY@endplate", 100, -1e-1, 1e-1, 100, -1e-1, 1e-1);
+   c1.add_h2d(9, "h42", "EVEN - Wire XY@hitz", 100, -100, 100, 100, -100, 100);
+   c1.add_h2d(10, "h52", "EVEN - MC Z vs ihit XY", 100, 0, 200, 100, -150, 150);
+   c1.add_h2d(11, "h62", "EVEN - MC PZ vs ihit", 100, 0, 200, 100, -150, 150); // MeV
 
-   TH2F* h13 = new TH2F("h13", "", 100, -100, 100, 100, -100, 100);
-   TH2F* h23 = new TH2F("h23", "", 100, -100, 100, 100, -100, 100);
-   TH2F* h33 = new TH2F("h33", "", 100, -1e-1, 1e-1, 100, -1e-1, 1e-1);
-   TH2F* h43 = new TH2F("h43", "", 100, -100, 100, 100, -100, 100);
-   TH2F* h53 = new TH2F("h53", "", 100, 0, 200, 100, -150, 150);
-   TH2F* h63 = new TH2F("h63", "", 100, 0, 200, 100, -150, 150); // MeV
+   c1.add_h2d(12, "h13", "EVEN - MC XY", 100, -100, 100, 100, -100, 100);
+   c1.add_h2d(13, "h23", "EVEN - Wire XY@endplate", 100, -100, 100, 100, -100, 100);
+   c1.add_h2d(14, "h33", "EVEN - Conformal XY@endplate", 100, -1e-1, 1e-1, 100, -1e-1, 1e-1);
+   c1.add_h2d(15, "h43", "EVEN - Wire XY@hitz", 100, -100, 100, 100, -100, 100);
+   c1.add_h2d(16, "h53", "EVEN - MC Z vs ihit XY", 100, 0, 200, 100, -150, 150);
+   c1.add_h2d(17, "h63", "EVEN - MC PZ vs ihit", 100, 0, 200, 100, -150, 150); // MeV
 
-   h11->SetStats(0);
-   h21->SetStats(0);
-   h31->SetStats(0);
-   h41->SetStats(0);
-   h51->SetStats(0);
-   h61->SetStats(0);
-   h12->SetStats(0);
-   h22->SetStats(0);
-   h32->SetStats(0);
-   h42->SetStats(0);
-   h52->SetStats(0);
-   h62->SetStats(0);
-   h13->SetStats(0);
-   h23->SetStats(0);
-   h33->SetStats(0);
-   h43->SetStats(0);
-   h53->SetStats(0);
-   h63->SetStats(0);
 
+   char title[12];
    for (int iev=0; iev<total; iev++) {
 
-      h11->SetTitle(Form("iev %d - ODD - MC XY", iev));
-      h21->SetTitle(Form("iev %d - ODD - Wire XY @ endplate", iev));
-      h31->SetTitle(Form("iev %d - ODD - Conformal XY @ endplate", iev));
-      h41->SetTitle(Form("iev %d - ODD - Wire XY @ hitZ", iev));
-      h51->SetTitle(Form("iev %d - ODD - MC Z vs ihit", iev));
-      h61->SetTitle(Form("iev %d - ODD - MC PZ vs ihit", iev));
-      h12->SetTitle(Form("iev %d - EVEN - MC XY", iev));
-      h22->SetTitle(Form("iev %d - EVEN - Wire XY @ endplate", iev));
-      h32->SetTitle(Form("iev %d - EVEN - Conformal XY @ endplate", iev));
-      h42->SetTitle(Form("iev %d - EVEN - Wire XY @ hitZ", iev));
-      h52->SetTitle(Form("iev %d - EVEN - MC Z vs ihit", iev));
-      h62->SetTitle(Form("iev %d - EVEN - MC PZ vs ihit", iev));
-
-      h13->SetTitle(Form("iev %d - ALL - MC XY", iev));
-      h23->SetTitle(Form("iev %d - ALL - Wire XY @ endplate", iev));
-      h33->SetTitle(Form("iev %d - ALL - Conformal XY @ endplate", iev));
-      h43->SetTitle(Form("iev %d - ALL - Wire XY @ hitZ", iev));
-      h53->SetTitle(Form("iev %d - ALL - MC Z vs ihit", iev));
-      h63->SetTitle(Form("iev %d - ALL - MC PZ vs ihit", iev));
-
-      c1->cd(1); h11->Draw();
-      c1->cd(2); h21->Draw();
-      c1->cd(3); h31->Draw();
-      c1->cd(4); h41->Draw();
-      c1->cd(5); h51->Draw();
-      c1->cd(6); h61->Draw();
-      c1->cd(7); h12->Draw();
-      c1->cd(8); h22->Draw();
-      c1->cd(9); h32->Draw();
-      c1->cd(10);h42->Draw();
-      c1->cd(11);h52->Draw();
-      c1->cd(12);h62->Draw();
-      c1->cd(13);h13->Draw();
-      c1->cd(14);h23->Draw();
-      c1->cd(15);h33->Draw();
-      c1->cd(16);h43->Draw();
-      c1->cd(17);h53->Draw();
-      c1->cd(18);h63->Draw();
+      sprintf(title, "iev %d ", iev);
+      //c1.update_title_prefix(title);
+      c1.draw_hists();
 
       inROOT.getEntry(iev);
       bool directHit = inROOT.InDirectHitAtTriggerCounter();
@@ -166,28 +225,26 @@ int main(int argc, char** argv)
          TMarker* m5 = getMarker(ilayer, iturn, ihit, mcPos.Z());
          TMarker* m6 = getMarker(ilayer, iturn, ihit, mcMom.Z()*1000); // GeV -> MeV
 
-         int offset = 0;
-         if (ilayer%2==0) offset = 6;
-         c1->cd(offset+1); m1->Draw();
-         c1->cd(offset+2); m2->Draw();
-         c1->cd(offset+3); m3->Draw();
-         c1->cd(offset+4); m4->Draw();
-         c1->cd(offset+5); m5->Draw();
-         c1->cd(offset+6); m6->Draw();
-
-         c1->cd(12+1); m1->Draw();
-         c1->cd(12+2); m2->Draw();
-         c1->cd(12+3); m3->Draw();
-         c1->cd(12+4); m4->Draw();
-         c1->cd(12+5); m5->Draw();
-         c1->cd(12+6); m6->Draw();
+         c1.cd(1); m1->Draw();
+         c1.cd(2); m2->Draw();
+         c1.cd(3); m3->Draw();
+         c1.cd(4); m4->Draw();
+         c1.cd(5); m5->Draw();
+         c1.cd(6); m6->Draw();
+         int offset = (ilayer%2==0)?6:12;
+         c1.cd(offset+1); m1->Draw();
+         c1.cd(offset+2); m2->Draw();
+         c1.cd(offset+3); m3->Draw();
+         c1.cd(offset+4); m4->Draw();
+         c1.cd(offset+5); m5->Draw();
+         c1.cd(offset+6); m6->Draw();
 
          printf("iev %d MC:     ihit %d (%f, %f, %f)\n", iev, ihit, mcPos.X(), mcPos.Y(), mcPos.Z());
          printf("iev %d Wire End:    ihit %d (%f, %f, %f) - (%f, %f, %f)\n", iev, ihit, w_x1, w_y1, w_z1, w_x2, w_y2, w_z2);
          printf("iev %d Conf End:    ihit %d (%g, %g)\n", iev, ihit, w_u1, w_v1);
          printf("iev %d MCWire: ihit %d (%f, %f, %f)\n", iev, ihit, w_x, w_y);
       }
-      c1->Print(Form("pdf/%05d.pdf", iev));
+      c1.print(Form("pdf/%05d.pdf", iev));
    }
    return 0;
 }

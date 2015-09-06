@@ -73,12 +73,12 @@ struct Hough
    };
    void transform(MyHits& hits)
    {
-      double astep = 0.1;
-      double bstep = 0.1;
-      double amin = 0;
-      double bmin = -10;
+      double astep = 0.01;
+      double amin = -10;
       double amax = 10;
-      double bmax = 10;
+      double bstep = 0.001;
+      double bmin = -0.1;
+      double bmax = 0.1;
       int anum = (amax-amin)/astep;
       int bnum = (bmax-bmin)/bstep;
       //printf("anum %d %f %f bnum %d %f %f\n", anum, amin, amax, bnum, bmin, bmax);

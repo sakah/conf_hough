@@ -150,6 +150,7 @@ int main(int argc, char** argv)
       for (int ihit=0; ihit<numHits; ihit++) {
          int ilayer = inROOT.getIlayer(ihit);
          int iturn = inROOT.getIturn(ihit);
+         if (iturn!=0) continue; 
 
          inROOT.getPosMom(ihit, mcPos, mcMom);
          inROOT.getWirePosAtEndPlates(ihit, w_x1, w_y1, w_z1, w_x2, w_y2, w_z2);

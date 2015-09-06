@@ -62,10 +62,15 @@ struct MyHits
 
 struct Hough
 {
+   TH2F* h2;
    double found_a;
    double found_b;
    int num_hits;
    int num_inside;
+   Hough()
+   {
+      h2 = NULL;
+   };
    void transform(MyHits& hits)
    {
       double astep = 0.1;
@@ -76,8 +81,11 @@ struct Hough
       double bmax = 10;
       int anum = (amax-amin)/astep;
       int bnum = (bmax-bmin)/bstep;
-      printf("anum %d\n", anum);
-      TH2F h2("h2","",anum, amin, amax, bnum, bmin, bmax);
+      //printf("anum %d %f %f bnum %d %f %f\n", anum, amin, amax, bnum, bmin, bmax);
+      if (h2==NULL) {
+         h2 = new TH2F("h2","",anum, amin, amax, bnum, bmin, bmax);
+      }
+      h2->Reset();
 
       for (int i=0; i<hits.num_hits; i++) {
          for (int ia=0; ia<anum; ia++) {
@@ -86,16 +94,15 @@ struct Hough
             double b = -hits.uhits[i]*a + hits.vhits[i];
 
             //printf("i %d a %lf b %lf\n", i, a, b);
-            h2.Fill(a, b, 1);
+            h2->Fill(a, b, 1);
          }
       }
       int ia_min;
       int ib_min;
       int tmp;
-      h2.GetMaximumBin(ia_min, ib_min, tmp);
-      found_a = h2.GetXaxis()->GetBinCenter(ia_min);
-      found_b = h2.GetYaxis()->GetBinCenter(ib_min);
-
+      h2->GetMaximumBin(ia_min, ib_min, tmp);
+      found_a = h2->GetXaxis()->GetBinCenter(ia_min);
+      found_b = h2->GetYaxis()->GetBinCenter(ib_min);
    };
    void calc_diff(MyHits& hits, double* diff)
    {
@@ -343,7 +350,7 @@ int main(int argc, char** argv)
       c1.print(Form("pdf/%05d.pdf", iev));
 
       Canvas c2;
-      c2.init(3,1);
+      c2.init(4,1);
 
       c2.add_h2d(0,"h101", "Wire XY@z", 100, -100, 100, 100, -100, 100);
       c2.add_h2d(1,"h102", "Conf UV@z", 100, -1e-1, 1e-1, 100, -1e-1, 1e-1);
@@ -388,6 +395,7 @@ int main(int argc, char** argv)
             }
             c2.cd(2); hough.get_line()->Draw("same");
             c2.cd(3); c2.h1d[0]->Draw();
+            c2.cd(4); hough.h2->Draw("colz");
             c2.print(Form("pdf/hough/%05d-%d-%d.pdf", iev,iz1,iz2));
          }
       }

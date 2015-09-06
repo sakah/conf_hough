@@ -51,8 +51,8 @@ int main(int argc, char** argv)
    TVector3 mcPos;
    TVector3 mcMom;
 
-   TCanvas* c1 = new TCanvas("c1","", 500*5, 500*2);
-   c1->Divide(5,2);
+   TCanvas* c1 = new TCanvas("c1","", 500*6, 500*2);
+   c1->Divide(6,2);
 
    TH2F* h11 = new TH2F("h11", "", 100, -100, 100, 100, -100, 100);
    TH2F* h21 = new TH2F("h21", "", 100, -100, 100, 100, -100, 100);

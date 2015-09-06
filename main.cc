@@ -386,7 +386,7 @@ int main(int argc, char** argv)
                c2.cd(1); m1->Draw();
                c2.cd(2); m2->Draw();
             }
-            c2.cd(2); hough.get_line()->Draw();
+            c2.cd(2); hough.get_line()->Draw("same");
             c2.cd(3); c2.h1d[0]->Draw();
             c2.print(Form("pdf/hough/%05d-%d-%d.pdf", iev,iz1,iz2));
          }

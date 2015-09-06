@@ -161,7 +161,7 @@ struct Canvas
    int h2idx[1000];
    void init(int _nx, int _ny)
    {
-      c1 = new TCanvas("c1","", 500*_nx, 500*_ny);
+      c1 = new TCanvas("c1","", 1000*_nx, 1000*_ny);
       c1->Divide(_nx,_ny);
       nx = _nx;
       ny = _ny;
@@ -396,7 +396,7 @@ int main(int argc, char** argv)
             c2.cd(2); hough.get_line()->Draw("same");
             c2.cd(3); c2.h1d[0]->Draw();
             c2.cd(4); hough.h2->Draw("colz");
-            c2.print(Form("pdf/hough/%05d-%d-%d.pdf", iev,iz1,iz2));
+            c2.print(Form("pdf/hough/%05d-%d-%d.png", iev,iz1,iz2));
          }
       }
       printf("iev %d num_hits %d max_num %d max_z1 %f max_z2 %f\n", iev, hough.num_hits, max_num, max_z1, max_z2);

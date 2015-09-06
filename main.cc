@@ -161,7 +161,7 @@ struct Canvas
    int h2idx[1000];
    void init(int _nx, int _ny)
    {
-      c1 = new TCanvas("c1","", 1000*_nx, 1000*_ny);
+      c1 = new TCanvas("c1","", 500*_nx, 500*_ny);
       c1->Divide(_nx,_ny);
       nx = _nx;
       ny = _ny;
@@ -354,7 +354,7 @@ int main(int argc, char** argv)
 
       c2.add_h2d(0,"h101", "Wire XY@z", 100, -100, 100, 100, -100, 100);
       c2.add_h2d(1,"h102", "Conf UV@z", 100, -1e-1, 1e-1, 100, -1e-1, 1e-1);
-      c2.add_h1d(2,"h103", "Diff", 100, -0.02, 0.02);
+      c2.add_h1d(2,"h103", "Diff", 100, -0.005, 0.005);
 
       struct Hough hough;
       int max_num = 0;

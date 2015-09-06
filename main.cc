@@ -137,7 +137,7 @@ struct Canvas
          for (int j=0; j<num_h1d; j++) {
             if (h1idx[j]==i) h1d[j]->Draw();
          }
-         for (int j=0; i<num_h2d; i++) {
+         for (int j=0; j<num_h2d; j++) {
             if (h2idx[j]==i) h2d[j]->Draw();
          }
       }

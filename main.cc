@@ -352,7 +352,8 @@ int main(int argc, char** argv)
             double z1 = iz1*10 - 50.0;
             double z2 = iz2*10 - 50.0;
 
-            c2.h1d[0]->Clear();
+            c2.h1d[0]->Reset();
+
             sprintf(title, "iev %d z1 %5.0f z2 %5.0f", iev, z1, z2);
             c2.update_title_prefix(title);
             c2.draw_hists();

@@ -136,7 +136,7 @@ int main(int argc, char** argv)
          TMarker* m6 = getMarker(iturn, ihit, mcMom.Z()*1000); // GeV -> MeV
 
          int offset = 0;
-         if (ilayer%2==0) offset = 5;
+         if (ilayer%2==0) offset = 6;
          c1->cd(offset+1); m1->Draw();
          c1->cd(offset+2); m2->Draw();
          c1->cd(offset+3); m3->Draw();

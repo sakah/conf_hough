@@ -5,6 +5,7 @@
 
 #include "TCanvas.h"
 #include "TH2F.h"
+#include "TF1.h"
 #include "TMarker.h"
 #include "InputROOT.h"
 
@@ -112,6 +113,12 @@ struct Hough
    void print(int iev)
    {
       printf("Hough:: iev %d found_a %f found_b %f (num_hits %d num_inside %d)\n", iev, found_a, found_b, num_hits, num_inside);
+   };
+   TF1* get_line()
+   {
+      TF1* f1 = new TF1("f1", "[0]+[1]*x", -1e-1, 1e-1);
+      f1->SetParameters(found_b, found_a);
+      return f1;
    };
 };
 
@@ -379,6 +386,7 @@ int main(int argc, char** argv)
                c2.cd(1); m1->Draw();
                c2.cd(2); m2->Draw();
             }
+            c2.cd(2); hough.get_line()->Draw();
             c2.cd(3); c2.h1d[0]->Draw();
             c2.print(Form("pdf/hough/%05d-%d-%d.pdf", iev,iz1,iz2));
          }

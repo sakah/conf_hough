@@ -8,6 +8,7 @@
 #include "TF1.h"
 #include "TMarker.h"
 #include "InputROOT.h"
+#include "TGraphErrors.h"
 
 struct MyHits
 {
@@ -24,6 +25,8 @@ struct MyHits
    // after conformal mapping
    double uhits[10000];
    double vhits[10000];
+   double eu[10000];
+   double ev[10000];
    MyHits()
    {
       num_hits = 0;
@@ -50,6 +53,8 @@ struct MyHits
          double r2 = xhits[ihit]*xhits[ihit] + yhits[ihit]*yhits[ihit];
          uhits[ihit] = 2.0*xhits[ihit]/r2;
          vhits[ihit] = 2.0*yhits[ihit]/r2;
+         eu[ihit] = 0.1;
+         ev[ihit] = 0.1;
       }
    };
    void print()
@@ -70,6 +75,14 @@ struct Hough
    Hough()
    {
       h2 = NULL;
+   };
+   void fit(MyHits& hits, int iev, double z1, double z2)
+   {
+      TGraphErrors* gr = new TGraphErrors(hits.num_hits, hits.uhits, hits.vhits, hits.eu, hits.ev);
+      gr->Fit("pol1");
+      TF1* f = gr->GetFunction("pol1");
+      double chi2 = f->GetChisquare();
+      printf("iev %d z1 %f z2 %f chi2 %f\n", iev, z1, z2, chi2);
    };
    void transform(MyHits& hits)
    {
@@ -373,6 +386,7 @@ int main(int argc, char** argv)
             c2.draw_hists();
 
             hits.calc_xyz(inROOT.getConfig(), z1, z2);
+            //hough.fit(hits, iev, z1, z2);
             hough.transform(hits);
             double diff[1000];
             hough.calc_diff(hits, diff);
@@ -393,7 +407,7 @@ int main(int argc, char** argv)
                c2.cd(1); m1->Draw();
                c2.cd(2); m2->Draw();
             }
-            c2.cd(2); hough.get_line()->Draw("same");
+            //c2.cd(2); hough.get_line()->Draw("same");
             c2.cd(3); c2.h1d[0]->Draw();
             c2.cd(4); hough.h2->Draw("colz");
             c2.print(Form("pdf/hough/%05d-%d-%d.pdf", iev,iz1,iz2));

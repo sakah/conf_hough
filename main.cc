@@ -18,7 +18,7 @@ TMarker* getMarker(int ilayer, int iturn, double x, double y)
    if (ilayer%2==0) m1->SetMarkerColor(2);
 
    if (iturn==0) m1->SetMarkerStyle(8); // ●
-   if (iturn==1) m1->SetMarkerStyle(4); // ○
+   if (iturn==1) m1->SetMarkerStyle(5); // x
    if (iturn==2) m1->SetMarkerStyle(22); // ▲
    if (iturn==3) m1->SetMarkerStyle(26); // △
 

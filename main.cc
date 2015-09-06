@@ -56,48 +56,58 @@ int main(int argc, char** argv)
 
    TH2F* h11 = new TH2F("h11", "", 100, -100, 100, 100, -100, 100);
    TH2F* h21 = new TH2F("h21", "", 100, -100, 100, 100, -100, 100);
-   TH2F* h31 = new TH2F("h31", "", 100, -100, 100, 100, -100, 100);
-   TH2F* h41 = new TH2F("h41", "", 100, 0, 200, 100, -150, 150);
-   TH2F* h51 = new TH2F("h51", "", 100, 0, 200, 100, -150, 150); // MeV
+   TH2F* h31 = new TH2F("h31", "", 100, -1e-1, 1e-1, 100, -1e-1, 1e-1);
+   TH2F* h41 = new TH2F("h41", "", 100, -100, 100, 100, -100, 100);
+   TH2F* h51 = new TH2F("h51", "", 100, 0, 200, 100, -150, 150);
+   TH2F* h61 = new TH2F("h61", "", 100, 0, 200, 100, -150, 150); // MeV
+
    TH2F* h12 = new TH2F("h12", "", 100, -100, 100, 100, -100, 100);
    TH2F* h22 = new TH2F("h22", "", 100, -100, 100, 100, -100, 100);
-   TH2F* h32 = new TH2F("h32", "", 100, -100, 100, 100, -100, 100);
-   TH2F* h42 = new TH2F("h42", "", 100, 0, 200, 100, -150, 150);
-   TH2F* h52 = new TH2F("h52", "", 100, 0, 200, 100, -150, 150); // MeV
+   TH2F* h32 = new TH2F("h32", "", 100, -1e-1, 1e-1, 100, -1e-1, 1e-1);
+   TH2F* h42 = new TH2F("h42", "", 100, -100, 100, 100, -100, 100);
+   TH2F* h52 = new TH2F("h52", "", 100, 0, 200, 100, -150, 150);
+   TH2F* h62 = new TH2F("h62", "", 100, 0, 200, 100, -150, 150); // MeV
+
    h11->SetStats(0);
    h21->SetStats(0);
    h31->SetStats(0);
    h41->SetStats(0);
    h51->SetStats(0);
+   h61->SetStats(0);
    h12->SetStats(0);
    h22->SetStats(0);
    h32->SetStats(0);
    h42->SetStats(0);
    h52->SetStats(0);
+   h62->SetStats(0);
 
    for (int iev=0; iev<total; iev++) {
 
       h11->SetTitle(Form("iev %d - ODD - MC XY", iev));
       h21->SetTitle(Form("iev %d - ODD - Wire XY @ endplate", iev));
-      h31->SetTitle(Form("iev %d - ODD - Wire XY @ hitZ", iev));
-      h41->SetTitle(Form("iev %d - ODD - MC Z vs ihit", iev));
-      h51->SetTitle(Form("iev %d - ODD - MC PZ vs ihit", iev));
+      h31->SetTitle(Form("iev %d - ODD - Conformal XY @ endplate", iev));
+      h41->SetTitle(Form("iev %d - ODD - Wire XY @ hitZ", iev));
+      h51->SetTitle(Form("iev %d - ODD - MC Z vs ihit", iev));
+      h61->SetTitle(Form("iev %d - ODD - MC PZ vs ihit", iev));
       h12->SetTitle(Form("iev %d - EVEN - MC XY", iev));
       h22->SetTitle(Form("iev %d - EVEN - Wire XY @ endplate", iev));
-      h32->SetTitle(Form("iev %d - EVEN - Wire XY @ hitZ", iev));
-      h42->SetTitle(Form("iev %d - EVEN - MC Z vs ihit", iev));
-      h52->SetTitle(Form("iev %d - EVEN - MC PZ vs ihit", iev));
+      h32->SetTitle(Form("iev %d - EVEN - Conformal XY @ endplate", iev));
+      h42->SetTitle(Form("iev %d - EVEN - Wire XY @ hitZ", iev));
+      h52->SetTitle(Form("iev %d - EVEN - MC Z vs ihit", iev));
+      h62->SetTitle(Form("iev %d - EVEN - MC PZ vs ihit", iev));
 
       c1->cd(1); h11->Draw();
       c1->cd(2); h21->Draw();
       c1->cd(3); h31->Draw();
       c1->cd(4); h41->Draw();
       c1->cd(5); h51->Draw();
-      c1->cd(6); h12->Draw();
-      c1->cd(7); h22->Draw();
-      c1->cd(8); h32->Draw();
-      c1->cd(9); h42->Draw();
-      c1->cd(10);h52->Draw();
+      c1->cd(6); h61->Draw();
+      c1->cd(7); h12->Draw();
+      c1->cd(8); h22->Draw();
+      c1->cd(9); h32->Draw();
+      c1->cd(10);h42->Draw();
+      c1->cd(11);h52->Draw();
+      c1->cd(12);h62->Draw();
 
       inROOT.getEntry(iev);
       bool directHit = inROOT.InDirectHitAtTriggerCounter();
@@ -115,11 +125,15 @@ int main(int argc, char** argv)
          inROOT.getWirePosAtEndPlates(ihit, w_x1, w_y1, w_z1, w_x2, w_y2, w_z2);
          inROOT.getWirePosAtHitPoint(ihit, w_x, w_y, w_z);
 
+         double r2 = w_x1*w_x1 + w_y1*w_y1;
+         double w_u1 = 2.0*w_x1/r2;
+         double w_v1 = 2.0*w_y1/r2;
          TMarker* m1 = getMarker(iturn, mcPos.X(), mcPos.Y());
          TMarker* m2 = getMarker(iturn, w_x1, w_y1);
-         TMarker* m3 = getMarker(iturn, w_x, w_y);
-         TMarker* m4 = getMarker(iturn, ihit, mcPos.Z());
-         TMarker* m5 = getMarker(iturn, ihit, mcMom.Z()*1000); // GeV -> MeV
+         TMarker* m3 = getMarker(iturn, w_u1, w_v1);
+         TMarker* m4 = getMarker(iturn, w_x, w_y);
+         TMarker* m5 = getMarker(iturn, ihit, mcPos.Z());
+         TMarker* m6 = getMarker(iturn, ihit, mcMom.Z()*1000); // GeV -> MeV
 
          int offset = 0;
          if (ilayer%2==0) offset = 5;
@@ -128,9 +142,11 @@ int main(int argc, char** argv)
          c1->cd(offset+3); m3->Draw();
          c1->cd(offset+4); m4->Draw();
          c1->cd(offset+5); m5->Draw();
+         c1->cd(offset+6); m6->Draw();
 
          printf("iev %d MC:     ihit %d (%f, %f, %f)\n", iev, ihit, mcPos.X(), mcPos.Y(), mcPos.Z());
-         printf("iev %d End:    ihit %d (%f, %f, %f) - (%f, %f, %f)\n", iev, ihit, w_x1, w_y1, w_z1, w_x2, w_y2, w_z2);
+         printf("iev %d Wire End:    ihit %d (%f, %f, %f) - (%f, %f, %f)\n", iev, ihit, w_x1, w_y1, w_z1, w_x2, w_y2, w_z2);
+         printf("iev %d Conf End:    ihit %d (%g, %g)\n", iev, ihit, w_u1, w_v1);
          printf("iev %d MCWire: ihit %d (%f, %f, %f)\n", iev, ihit, w_x, w_y);
       }
       c1->Print(Form("pdf/%05d.pdf", iev));

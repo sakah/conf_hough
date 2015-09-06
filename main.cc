@@ -95,13 +95,16 @@ struct Hough
       found_a = h2.GetXaxis()->GetBinCenter(ia_min);
       found_b = h2.GetYaxis()->GetBinCenter(ib_min);
 
+   };
+   void calc_diff(MyHits& hits, double* diff)
+   {
       num_hits = hits.num_hits;
       num_inside=0;
       for (int ihit=0; ihit<num_hits; ihit++) {
          double v = found_a * hits.uhits[ihit] + found_b;
-         double diff = v - hits.vhits[ihit];
+         diff[ihit] = v - hits.vhits[ihit];
          //printf("ihit %d vcalc %f vhits %f diff %f\n", ihit, v, hits.vhits[ihit], diff);
-         if (TMath::Abs(diff) < 0.05) {
+         if (TMath::Abs(diff[ihit]) < 0.05) {
             num_inside++;
          }
       }
@@ -333,27 +336,32 @@ int main(int argc, char** argv)
       c1.print(Form("pdf/%05d.pdf", iev));
 
       Canvas c2;
-      c2.init(2,1);
+      c2.init(3,1);
 
       c2.add_h2d(0,"h101", "Wire XY@z", 100, -100, 100, 100, -100, 100);
       c2.add_h2d(1,"h102", "Conf UV@z", 100, -1e-1, 1e-1, 100, -1e-1, 1e-1);
+      c2.add_h1d(2,"h103", "Diff", 100, -1e-1, 1e-1);
 
       struct Hough hough;
       int max_num = 0;
       double max_z1 = 0;
       double max_z2 = 0;
-      for (int iz1=0; iz1<100; iz1++) {
-         for (int iz2=0; iz2<100; iz2++) {
+      for (int iz1=0; iz1<10; iz1++) {
+         for (int iz2=0; iz2<10; iz2++) {
 
-            double z1 = iz1 - 50.0;
-            double z2 = iz2 - 50.0;
+            double z1 = iz1*10 - 50.0;
+            double z2 = iz2*10 - 50.0;
 
+            c2.h1d[0]->Clear();
             sprintf(title, "iev %d z1 %5.0f z2 %5.0f", iev, z1, z2);
             c2.update_title_prefix(title);
             c2.draw_hists();
 
             hits.calc_xyz(inROOT.getConfig(), z1, z2);
             hough.transform(hits);
+            double diff[1000];
+            hough.calc_diff(hits, diff);
+            for (int ihit=0; ihit<hough.num_hits; ihit++) c2.h1d[0]->Fill(diff[ihit]);
             if (hough.num_inside > max_num) {
                max_num = hough.num_inside;
                max_z1 = z1;
@@ -370,6 +378,7 @@ int main(int argc, char** argv)
                c2.cd(1); m1->Draw();
                c2.cd(2); m2->Draw();
             }
+            c2.cd(3); c2.h1d[0]->Draw();
             c2.print(Form("pdf/hough/%05d-%d-%d.pdf", iev,iz1,iz2));
          }
       }

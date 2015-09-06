@@ -75,7 +75,7 @@ struct Hough
    {
       double astep = 0.1;
       double bstep = 0.1;
-      double amin = -10;
+      double amin = 0;
       double bmin = -10;
       double amax = 10;
       double bmax = 10;

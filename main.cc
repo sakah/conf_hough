@@ -8,16 +8,20 @@
 #include "TMarker.h"
 #include "InputROOT.h"
 
-TMarker* getMarker(int iturn, double x, double y)
+TMarker* getMarker(int ilayer, int iturn, double x, double y)
 {
    TMarker *m1 = new TMarker(x, y, 8);
    m1->SetMarkerSize(0.3);
    m1->SetMarkerColor(1);
 
-   if (iturn==0) m1->SetMarkerColor(2);
-   if (iturn==1) m1->SetMarkerColor(3);
-   if (iturn==2) m1->SetMarkerColor(4);
-   if (iturn==3) m1->SetMarkerColor(5);
+   if (ilayer%2==1) m1->SetMarkerColor(1);
+   if (ilayer%2==0) m1->SetMarkerColor(2);
+
+   if (iturn==0) m1->SetMarkerStyle(8); // ●
+   if (iturn==1) m1->SetMarkerStyle(4); // ○
+   if (iturn==2) m1->SetMarkerStyle(22); // ▲
+   if (iturn==3) m1->SetMarkerStyle(26); // △
+
    return m1;
 }
 int main(int argc, char** argv)
@@ -51,8 +55,8 @@ int main(int argc, char** argv)
    TVector3 mcPos;
    TVector3 mcMom;
 
-   TCanvas* c1 = new TCanvas("c1","", 500*6, 500*2);
-   c1->Divide(6,2);
+   TCanvas* c1 = new TCanvas("c1","", 500*6, 500*3);
+   c1->Divide(6,3);
 
    TH2F* h11 = new TH2F("h11", "", 100, -100, 100, 100, -100, 100);
    TH2F* h21 = new TH2F("h21", "", 100, -100, 100, 100, -100, 100);
@@ -68,6 +72,13 @@ int main(int argc, char** argv)
    TH2F* h52 = new TH2F("h52", "", 100, 0, 200, 100, -150, 150);
    TH2F* h62 = new TH2F("h62", "", 100, 0, 200, 100, -150, 150); // MeV
 
+   TH2F* h13 = new TH2F("h13", "", 100, -100, 100, 100, -100, 100);
+   TH2F* h23 = new TH2F("h23", "", 100, -100, 100, 100, -100, 100);
+   TH2F* h33 = new TH2F("h33", "", 100, -1e-1, 1e-1, 100, -1e-1, 1e-1);
+   TH2F* h43 = new TH2F("h43", "", 100, -100, 100, 100, -100, 100);
+   TH2F* h53 = new TH2F("h53", "", 100, 0, 200, 100, -150, 150);
+   TH2F* h63 = new TH2F("h63", "", 100, 0, 200, 100, -150, 150); // MeV
+
    h11->SetStats(0);
    h21->SetStats(0);
    h31->SetStats(0);
@@ -80,6 +91,12 @@ int main(int argc, char** argv)
    h42->SetStats(0);
    h52->SetStats(0);
    h62->SetStats(0);
+   h13->SetStats(0);
+   h23->SetStats(0);
+   h33->SetStats(0);
+   h43->SetStats(0);
+   h53->SetStats(0);
+   h63->SetStats(0);
 
    for (int iev=0; iev<total; iev++) {
 
@@ -96,6 +113,13 @@ int main(int argc, char** argv)
       h52->SetTitle(Form("iev %d - EVEN - MC Z vs ihit", iev));
       h62->SetTitle(Form("iev %d - EVEN - MC PZ vs ihit", iev));
 
+      h13->SetTitle(Form("iev %d - ALL - MC XY", iev));
+      h23->SetTitle(Form("iev %d - ALL - Wire XY @ endplate", iev));
+      h33->SetTitle(Form("iev %d - ALL - Conformal XY @ endplate", iev));
+      h43->SetTitle(Form("iev %d - ALL - Wire XY @ hitZ", iev));
+      h53->SetTitle(Form("iev %d - ALL - MC Z vs ihit", iev));
+      h63->SetTitle(Form("iev %d - ALL - MC PZ vs ihit", iev));
+
       c1->cd(1); h11->Draw();
       c1->cd(2); h21->Draw();
       c1->cd(3); h31->Draw();
@@ -108,6 +132,12 @@ int main(int argc, char** argv)
       c1->cd(10);h42->Draw();
       c1->cd(11);h52->Draw();
       c1->cd(12);h62->Draw();
+      c1->cd(13);h13->Draw();
+      c1->cd(14);h23->Draw();
+      c1->cd(15);h33->Draw();
+      c1->cd(16);h43->Draw();
+      c1->cd(17);h53->Draw();
+      c1->cd(18);h63->Draw();
 
       inROOT.getEntry(iev);
       bool directHit = inROOT.InDirectHitAtTriggerCounter();
@@ -128,12 +158,12 @@ int main(int argc, char** argv)
          double r2 = w_x1*w_x1 + w_y1*w_y1;
          double w_u1 = 2.0*w_x1/r2;
          double w_v1 = 2.0*w_y1/r2;
-         TMarker* m1 = getMarker(iturn, mcPos.X(), mcPos.Y());
-         TMarker* m2 = getMarker(iturn, w_x1, w_y1);
-         TMarker* m3 = getMarker(iturn, w_u1, w_v1);
-         TMarker* m4 = getMarker(iturn, w_x, w_y);
-         TMarker* m5 = getMarker(iturn, ihit, mcPos.Z());
-         TMarker* m6 = getMarker(iturn, ihit, mcMom.Z()*1000); // GeV -> MeV
+         TMarker* m1 = getMarker(ilayer, iturn, mcPos.X(), mcPos.Y());
+         TMarker* m2 = getMarker(ilayer, iturn, w_x1, w_y1);
+         TMarker* m3 = getMarker(ilayer, iturn, w_u1, w_v1);
+         TMarker* m4 = getMarker(ilayer, iturn, w_x, w_y);
+         TMarker* m5 = getMarker(ilayer, iturn, ihit, mcPos.Z());
+         TMarker* m6 = getMarker(ilayer, iturn, ihit, mcMom.Z()*1000); // GeV -> MeV
 
          int offset = 0;
          if (ilayer%2==0) offset = 6;
@@ -143,6 +173,13 @@ int main(int argc, char** argv)
          c1->cd(offset+4); m4->Draw();
          c1->cd(offset+5); m5->Draw();
          c1->cd(offset+6); m6->Draw();
+
+         c1->cd(12+1); m1->Draw();
+         c1->cd(12+2); m2->Draw();
+         c1->cd(12+3); m3->Draw();
+         c1->cd(12+4); m4->Draw();
+         c1->cd(12+5); m5->Draw();
+         c1->cd(12+6); m6->Draw();
 
          printf("iev %d MC:     ihit %d (%f, %f, %f)\n", iev, ihit, mcPos.X(), mcPos.Y(), mcPos.Z());
          printf("iev %d Wire End:    ihit %d (%f, %f, %f) - (%f, %f, %f)\n", iev, ihit, w_x1, w_y1, w_z1, w_x2, w_y2, w_z2);

@@ -301,7 +301,8 @@ int main(int argc, char** argv)
 
 
    char title[12];
-   for (int iev=8; iev<9; iev++) {
+   for (int iev=3; iev<4; iev++) {
+//   for (int iev=0; iev<100; iev++) {
 
       sprintf(title, "iev %d ", iev);
       c1.update_title_prefix(title);
@@ -373,11 +374,15 @@ int main(int argc, char** argv)
       int max_num = 0;
       double max_z1 = 0;
       double max_z2 = 0;
-      for (int iz1=0; iz1<10; iz1++) {
-         for (int iz2=0; iz2<10; iz2++) {
 
-            double z1 = iz1*10 - 50.0;
-            double z2 = iz2*10 - 50.0;
+      double min_rms = 1e10;
+      double min_z1 = 0;
+      double min_z2 = 0;
+      for (int iz1=0; iz1<20; iz1++) {
+         for (int iz2=0; iz2<20; iz2++) {
+
+            double z1 = iz1*10 - 100.0;
+            double z2 = iz2*10 - 100.0;
 
             c2.h1d[0]->Reset();
 
@@ -391,12 +396,19 @@ int main(int argc, char** argv)
             double diff[1000];
             hough.calc_diff(hits, diff);
             for (int ihit=0; ihit<hough.num_hits; ihit++) c2.h1d[0]->Fill(diff[ihit]);
-            if (hough.num_inside > max_num) {
-               max_num = hough.num_inside;
-               max_z1 = z1;
-               max_z2 = z2;
+            //printf("## iev %d z1 %f z2 %f RMS %f\n", iev, z1, z2, c2.h1d[0]->GetRMS());
+            double rms = c2.h1d[0]->GetRMS();
+            if (min_rms > rms) {
+               min_rms = rms;
+               min_z1 = z1;
+               min_z2 = z2;
             }
-            hough.print(iev);
+            //if (hough.num_inside > max_num) {
+            //   max_num = hough.num_inside;
+            //   max_z1 = z1;
+            //   max_z2 = z2;
+            //}
+            //hough.print(iev);
 
             for (int ihit=0; ihit<hits.num_hits; ihit++) {
                int ilayer = hits.ilayer[ihit];
@@ -413,7 +425,8 @@ int main(int argc, char** argv)
             c2.print(Form("pdf/hough/%05d-%d-%d.pdf", iev,iz1,iz2));
          }
       }
-      printf("iev %d num_hits %d max_num %d max_z1 %f max_z2 %f\n", iev, hough.num_hits, max_num, max_z1, max_z2);
+      //printf("iev %d num_hits %d max_num %d max_z1 %f max_z2 %f\n", iev, hough.num_hits, max_num, max_z1, max_z2);
+      printf("iev %d num_hits %d min_rms %f min_z1 %f min_z2 %f\n", iev, hough.num_hits, min_rms, min_z1, min_z2);
 
    }
    return 0;

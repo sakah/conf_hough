@@ -299,40 +299,7 @@ int main(int argc, char** argv)
    TVector3 mcPos;
    TVector3 mcMom;
 
-   Canvas c1;
-   c1.init(6, 3);
-
-   c1.add_h2d(0, "h11", "ALL - MC XY", 100, -100, 100, 100, -100, 100);
-   c1.add_h2d(1, "h21", "ALL - Wire XY@endplate", 100, -100, 100, 100, -100, 100);
-   c1.add_h2d(2, "h31", "ALL - Conformal XY@endplate", 100, -1e-1, 1e-1, 100, -1e-1, 1e-1);
-   c1.add_h2d(3, "h41", "ALL - Wire XY @hitz", 100, -100, 100, 100, -100, 100);
-   c1.add_h2d(4, "h51", "ALL - MC Z vs ihit XY", 100, 0, 200, 100, -150, 150);
-   c1.add_h2d(5, "h61", "ALL - MC PZ vs ihit", 100, 0, 200, 100, -150, 150); // MeV
-
-   c1.add_h2d(6, "h12", "EVEN - MC XY", 100, -100, 100, 100, -100, 100);
-   c1.add_h2d(7, "h22", "EVEN - Wire XY@endplate", 100, -100, 100, 100, -100, 100);
-   c1.add_h2d(8, "h32", "EVEN - Conformal XY@endplate", 100, -1e-1, 1e-1, 100, -1e-1, 1e-1);
-   c1.add_h2d(9, "h42", "EVEN - Wire XY@hitz", 100, -100, 100, 100, -100, 100);
-   c1.add_h2d(10,"h52", "EVEN - MC Z vs ihit XY", 100, 0, 200, 100, -150, 150);
-   c1.add_h2d(11,"h62", "EVEN - MC PZ vs ihit", 100, 0, 200, 100, -150, 150); // MeV
-
-   c1.add_h2d(12,"h13", "EVEN - MC XY", 100, -100, 100, 100, -100, 100);
-   c1.add_h2d(13,"h23", "EVEN - Wire XY@endplate", 100, -100, 100, 100, -100, 100);
-   c1.add_h2d(14,"h33", "EVEN - Conformal XY@endplate", 100, -1e-1, 1e-1, 100, -1e-1, 1e-1);
-   c1.add_h2d(15,"h43", "EVEN - Wire XY@hitz", 100, -100, 100, 100, -100, 100);
-   c1.add_h2d(16,"h53", "EVEN - MC Z vs ihit XY", 100, 0, 200, 100, -150, 150);
-   c1.add_h2d(17,"h63", "EVEN - MC PZ vs ihit", 100, 0, 200, 100, -150, 150); // MeV
-
-   c1.debug();
-
-
-   char title[12];
-//   for (int iev=3; iev<4; iev++) {
-   for (int iev=94; iev<95; iev++) {
-
-      sprintf(title, "iev %d ", iev);
-      c1.update_title_prefix(title);
-      c1.draw_hists();
+   for (int iev=0; iev<1000; iev++) {
 
       inROOT.getEntry(iev);
       bool directHit = inROOT.InDirectHitAtTriggerCounter();
@@ -350,7 +317,7 @@ int main(int argc, char** argv)
          int icell = inROOT.getIcell(ihit);
          int iturn = inROOT.getIturn(ihit);
 //         if (iturn!=0) continue; 
-         printf("ilayer %d icell %d iturn %d\n", ilayer, icell, iturn);
+//         printf("ilayer %d icell %d iturn %d\n", ilayer, icell, iturn);
 
          inROOT.getPosMom(ihit, mcPos, mcMom);
          inROOT.getWirePosAtEndPlates(ihit, w_x1, w_y1, w_z1, w_x2, w_y2, w_z2);
@@ -369,26 +336,7 @@ int main(int argc, char** argv)
          TMarker* m5 = getMarker(8, ilayer, iturn, ihit, mcPos.Z());
          TMarker* m6 = getMarker(8, ilayer, iturn, ihit, mcMom.Z()*1000); // GeV -> MeV
 
-         c1.cd(1); m1->Draw();
-         c1.cd(2); m2->Draw();
-         c1.cd(3); m3->Draw();
-         c1.cd(4); m4->Draw();
-         c1.cd(5); m5->Draw();
-         c1.cd(6); m6->Draw();
-         int offset = (ilayer%2==0)?6:12;
-         c1.cd(offset+1); m1->Draw();
-         c1.cd(offset+2); m2->Draw();
-         c1.cd(offset+3); m3->Draw();
-         c1.cd(offset+4); m4->Draw();
-         c1.cd(offset+5); m5->Draw();
-         c1.cd(offset+6); m6->Draw();
-
-         //printf("iev %d MC:     ihit %d (%f, %f, %f)\n", iev, ihit, mcPos.X(), mcPos.Y(), mcPos.Z());
-         //printf("iev %d Wire End:    ihit %d (%f, %f, %f) - (%f, %f, %f)\n", iev, ihit, w_x1, w_y1, w_z1, w_x2, w_y2, w_z2);
-         //printf("iev %d Conf End:    ihit %d (%g, %g)\n", iev, ihit, w_u1, w_v1);
-         //printf("iev %d MCWire: ihit %d (%f, %f, %f)\n", iev, ihit, w_x, w_y);
       }
-      c1.print(Form("pdf/%05d.pdf", iev));
 
       // Endplate
       Canvas c2;
@@ -411,12 +359,9 @@ int main(int argc, char** argv)
          inROOT.getWirePosAtEndPlates(ihit, x1, y1, z1, x2, y2, z2);
          inROOT.getWirePosAtHitPoint(ihit, xmc, ymc, zmc);
          TMarker* m1 = getMarker(8, ilayer, iturn, x1, y1);
-         //TMarker* m2 = getMarker(5, ilayer, iturn, xmc, ymc);
          c2.cd(1); 
          m1->Draw();
-         //m2->Draw();
       }
-      //c2.cd(2); hough.get_line()->Draw("same");
       c2.print(Form("pdf/endplate_%05d.pdf", iev));
 
       // MCZ

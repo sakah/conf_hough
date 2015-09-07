@@ -249,7 +249,7 @@ void draw_radius(struct config* config)
    for (int ilayer=0; ilayer<config->sense_layer_size; ilayer++) {
       double r = config_get_layer_radius(config, ilayer, LAYER_TYPE_SENSE, 0);
       TEllipse* e = new TEllipse(0,0,r);
-      e->SetFillStyle(4000);
+      e->SetFillStyle(0);
       e->Draw();
    }
 }

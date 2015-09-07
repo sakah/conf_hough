@@ -393,9 +393,9 @@ int main(int argc, char** argv)
       Canvas c2;
       c2.init(1,1);
 
-      c2.add_h1d(0,"h103", "Diff", 100, -0.005, 0.005);
+      c2.add_h2d(0, "h100", "Wire XY@endplate/MCZ", 100, -100, 100, 100, -100, 100);
 
-      c2.h1d[0]->Reset();
+      c2.h2d[0]->Reset();
 
       c2.draw_hists();
       c2.cd(1); draw_radius(inROOT.getConfig());

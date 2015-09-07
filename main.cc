@@ -175,7 +175,7 @@ struct Canvas
    int h2idx[1000];
    void init(int _nx, int _ny)
    {
-      c1 = new TCanvas("c1","", 100*_nx, 100*_ny);
+      c1 = new TCanvas("c1","", 1000*_nx, 1000*_ny);
       c1->Divide(_nx,_ny);
       nx = _nx;
       ny = _ny;

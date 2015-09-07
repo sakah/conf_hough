@@ -299,7 +299,8 @@ int main(int argc, char** argv)
    TVector3 mcPos;
    TVector3 mcMom;
 
-   for (int iev=0; iev<1000; iev++) {
+   //for (int iev=0; iev<1000; iev++) {
+   for (int iev=306; iev<307; iev++) {
 
       inROOT.getEntry(iev);
       bool directHit = inROOT.InDirectHitAtTriggerCounter();
@@ -352,12 +353,12 @@ int main(int argc, char** argv)
 
       for (int ihit=0; ihit<hits.num_hits; ihit++) {
          int ilayer = hits.ilayer[ihit];
+         int icell = hits.icell[ihit];
          int iturn = hits.iturn[ihit];
          double x1, y1, z1;
          double x2, y2, z2;
-         double xmc, ymc, zmc;
+         //printf("ilayer %d icell %d iturn %d\n", ilayer, icell, iturn);
          inROOT.getWirePosAtEndPlates(ihit, x1, y1, z1, x2, y2, z2);
-         inROOT.getWirePosAtHitPoint(ihit, xmc, ymc, zmc);
          TMarker* m1 = getMarker(8, ilayer, iturn, x1, y1);
          c2.cd(1); 
          m1->Draw();
@@ -376,18 +377,24 @@ int main(int argc, char** argv)
       c3.draw_hists();
       c3.cd(1); draw_radius(inROOT.getConfig());
 
-      for (int ihit=0; ihit<hits.num_hits; ihit++) {
-         int ilayer = hits.ilayer[ihit];
-         int iturn = hits.iturn[ihit];
-         double x1, y1, z1;
-         double x2, y2, z2;
-         double xmc, ymc, zmc;
-         inROOT.getWirePosAtEndPlates(ihit, x1, y1, z1, x2, y2, z2);
-         inROOT.getWirePosAtHitPoint(ihit, xmc, ymc, zmc);
-         TMarker* m1 = getMarker(5, ilayer, iturn, xmc, ymc);
+      for (int icell=90; icell<120; icell++) {
+         double wx, wy;
+         config_get_wire_pos(inROOT.getConfig(), 2, LAYER_TYPE_SENSE, icell, WIRE_TYPE_SENSE, 0, "center", &wx, &wy);
+         TMarker* m1 = getMarker(5, 2, 0, wx, wy);
          c3.cd(1); 
          m1->Draw();
       }
+      //for (int ihit=0; ihit<hits.num_hits; ihit++) {
+      //   int ilayer = hits.ilayer[ihit];
+      //   int icell = hits.icell[ihit];
+      //   int iturn = hits.iturn[ihit];
+      //   double xmc, ymc, zmc;
+      //   printf("ilayer %d icell %d iturn %d\n", ilayer, icell, iturn);
+      //   inROOT.getWirePosAtHitPoint(ihit, xmc, ymc, zmc);
+      //   TMarker* m1 = getMarker(5, ilayer, iturn, xmc, ymc);
+      //   c3.cd(1); 
+      //   m1->Draw();
+      //}
       c3.print(Form("pdf/mcz_%05d.pdf", iev));
    }
    return 0;

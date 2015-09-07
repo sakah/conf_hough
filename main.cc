@@ -390,6 +390,7 @@ int main(int argc, char** argv)
       }
       c1.print(Form("pdf/%05d.pdf", iev));
 
+      // Endplate
       Canvas c2;
       c2.init(1,1);
 
@@ -416,7 +417,33 @@ int main(int argc, char** argv)
          //m2->Draw();
       }
       //c2.cd(2); hough.get_line()->Draw("same");
-      c2.print(Form("pdf/hough/%05d.pdf", iev));
+      c2.print(Form("pdf/endplate_%05d.pdf", iev));
+
+      // MCZ
+      Canvas c3;
+      c3.init(1,1);
+
+      c3.add_h2d(0, "h100", "Wire XY@endplate/MCZ", 100, -100, 100, 100, -100, 100);
+
+
+      c3.h2d[0]->Reset();
+
+      c3.draw_hists();
+      c3.cd(1); draw_radius(inROOT.getConfig());
+
+      for (int ihit=0; ihit<hits.num_hits; ihit++) {
+         int ilayer = hits.ilayer[ihit];
+         int iturn = hits.iturn[ihit];
+         double x1, y1, z1;
+         double x2, y2, z2;
+         double xmc, ymc, zmc;
+         inROOT.getWirePosAtEndPlates(ihit, x1, y1, z1, x2, y2, z2);
+         inROOT.getWirePosAtHitPoint(ihit, xmc, ymc, zmc);
+         TMarker* m1 = getMarker(5, ilayer, iturn, xmc, ymc);
+         c3.cd(1); 
+         m1->Draw();
+      }
+      c3.print(Form("pdf/mcz_%05d.pdf", iev));
    }
    return 0;
 }

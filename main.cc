@@ -145,29 +145,44 @@ struct Hough
 
 TMarker* getMarker(int ilayer, int iturn, double x, double y)
 {
+   //TMarker *m1 = new TMarker(x, y, 8);
+   //m1->SetMarkerSize(0.3);
+
+   //if (ilayer%2==1) m1->SetMarkerColor(kRed);
+   //if (ilayer%2==0) m1->SetMarkerColor(kBlue);
+
+   //if (iturn==0) m1->SetMarkerStyle(8); // ●
+   //if (iturn==1) m1->SetMarkerStyle(5); // x
+   //if (iturn==2) m1->SetMarkerStyle(22); // ▲
+   //if (iturn==3) m1->SetMarkerStyle(26); // △
+
+   //return m1;
    TMarker *m1 = new TMarker(x, y, 8);
    m1->SetMarkerSize(0.3);
 
-   if (ilayer%2==1) m1->SetMarkerColor(kRed);
-   if (ilayer%2==0) m1->SetMarkerColor(kBlue);
-
-   if (iturn==0) m1->SetMarkerStyle(8); // ●
-   if (iturn==1) m1->SetMarkerStyle(5); // x
-   if (iturn==2) m1->SetMarkerStyle(22); // ▲
-   if (iturn==3) m1->SetMarkerStyle(26); // △
+   int color=kBlack;
+   if (iturn==1) color=kRed;
+   if (iturn==2) color=kBlue;
+   if (iturn==3) color=kCyan;
+   if (iturn==4) color=kMagenta;
+   if (iturn>=5) color=kGreen;
+   m1->SetMarkerColor(color);
 
    return m1;
 }
 
 TMarker* getMarkerMC(int ilayer, int iturn, double x, double y)
 {
-   TMarker *m1 = new TMarker(x, y, 8);
+   TMarker *m1 = new TMarker(x, y, 5);
    m1->SetMarkerSize(0.3);
 
-   if (ilayer%2==1) m1->SetMarkerColor(kRed);
-   if (ilayer%2==0) m1->SetMarkerColor(kBlue);
-
-   if (iturn==0) m1->SetMarkerStyle(5); // x
+   int color=kBlack;
+   if (iturn==1) color=kRed;
+   if (iturn==2) color=kBlue;
+   if (iturn==3) color=kCyan;
+   if (iturn==4) color=kMagenta;
+   if (iturn>=5) color=kGreen;
+   m1->SetMarkerColor(color);
 
    return m1;
 }

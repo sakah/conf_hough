@@ -175,7 +175,7 @@ struct Canvas
    int h2idx[1000];
    void init(int _nx, int _ny)
    {
-      c1 = new TCanvas("c1","", 500*_nx, 500*_ny);
+      c1 = new TCanvas("c1","", 100*_nx, 100*_ny);
       c1->Divide(_nx,_ny);
       nx = _nx;
       ny = _ny;
@@ -244,11 +244,14 @@ struct Canvas
    };
 };
 
-void draw_radius()
+void draw_radius(struct config* config)
 {
-   TEllipse* e = new TEllipse(0,0,50);
-   e->SetFillStyle(4000);
-   e->Draw();
+   for (int ilayer=0; ilayer<config->sense_layer_size; ilayer++) {
+      double r = config_get_layer_radius(config, ilayer, LAYER_TYPE_SENSE, 0);
+      TEllipse* e = new TEllipse(0,0,r);
+      e->SetFillStyle(4000);
+      e->Draw();
+   }
 }
 int main(int argc, char** argv)
 {
@@ -427,7 +430,7 @@ int main(int argc, char** argv)
                c2.cd(1); m1->Draw();
                c2.cd(2); m2->Draw();
             }
-            c2.cd(1); draw_radius();
+            c2.cd(1); draw_radius(inROOT.getConfig());
             //c2.cd(2); hough.get_line()->Draw("same");
             c2.cd(3); c2.h1d[0]->Draw();
             c2.cd(4); hough.h2->Draw("colz");

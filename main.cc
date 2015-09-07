@@ -327,8 +327,8 @@ int main(int argc, char** argv)
 
 
    char title[12];
-   for (int iev=3; iev<4; iev++) {
-//   for (int iev=0; iev<100; iev++) {
+//   for (int iev=3; iev<4; iev++) {
+   for (int iev=94; iev<95; iev++) {
 
       sprintf(title, "iev %d ", iev);
       c1.update_title_prefix(title);
@@ -349,7 +349,7 @@ int main(int argc, char** argv)
          int ilayer = inROOT.getIlayer(ihit);
          int icell = inROOT.getIcell(ihit);
          int iturn = inROOT.getIturn(ihit);
-         if (iturn!=0) continue; 
+//         if (iturn!=0) continue; 
          printf("ilayer %d icell %d iturn %d\n", ilayer, icell, iturn);
 
          inROOT.getPosMom(ihit, mcPos, mcMom);

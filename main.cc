@@ -317,8 +317,7 @@ int main(int argc, char** argv)
    TVector3 mcPos;
    TVector3 mcMom;
 
-   //for (int iev=0; iev<1000; iev++) {
-   for (int iev=306; iev<307; iev++) {
+   for (int iev=0; iev<1000; iev++) {
 
       inROOT.getEntry(iev);
       bool directHit = inROOT.InDirectHitAtTriggerCounter();
@@ -405,7 +404,7 @@ int main(int argc, char** argv)
          int iturn = hits.iturn[ihit];
          double rdrift = hits.rdrift[ihit];
          double xmc, ymc, zmc;
-         printf("ilayer %d icell %d iturn %d\n", ilayer, icell, iturn);
+         //printf("ilayer %d icell %d iturn %d\n", ilayer, icell, iturn);
          inROOT.getWirePosAtHitPoint(ihit, xmc, ymc, zmc);
          TMarker* m1 = getMarker(5, ilayer, iturn, xmc, ymc);
          TEllipse* e1 = getEllipse(ilayer, iturn, xmc, ymc, rdrift);

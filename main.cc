@@ -9,6 +9,7 @@
 #include "TMarker.h"
 #include "InputROOT.h"
 #include "TGraphErrors.h"
+#include "TEllipse.h"
 
 struct MyHits
 {
@@ -242,6 +243,13 @@ struct Canvas
       c1->Print(pdf_name);
    };
 };
+
+void draw_radius()
+{
+   TEllipse* e = new TEllipse(0,0,50);
+   e->SetFillStyle(4000);
+   e->Draw();
+}
 int main(int argc, char** argv)
 {
    if (argc != 8) {
@@ -419,6 +427,7 @@ int main(int argc, char** argv)
                c2.cd(1); m1->Draw();
                c2.cd(2); m2->Draw();
             }
+            c2.cd(1); draw_radius();
             //c2.cd(2); hough.get_line()->Draw("same");
             c2.cd(3); c2.h1d[0]->Draw();
             c2.cd(4); hough.h2->Draw("colz");

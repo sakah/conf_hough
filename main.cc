@@ -143,7 +143,7 @@ struct Hough
    };
 };
 
-TMarker* getMarker(int ilayer, int iturn, double x, double y)
+TMarker* getMarker(int marker_style, int ilayer, int iturn, double x, double y)
 {
    //TMarker *m1 = new TMarker(x, y, 8);
    //m1->SetMarkerSize(0.3);
@@ -157,31 +157,16 @@ TMarker* getMarker(int ilayer, int iturn, double x, double y)
    //if (iturn==3) m1->SetMarkerStyle(26); // △
 
    //return m1;
-   TMarker *m1 = new TMarker(x, y, 8);
+   TMarker *m1 = new TMarker(x, y, marker_style);
    m1->SetMarkerSize(0.3);
 
    int color=kBlack;
-   if (iturn==1) color=kRed;
-   if (iturn==2) color=kBlue;
-   if (iturn==3) color=kCyan;
-   if (iturn==4) color=kMagenta;
-   if (iturn>=5) color=kGreen;
-   m1->SetMarkerColor(color);
-
-   return m1;
-}
-
-TMarker* getMarkerMC(int ilayer, int iturn, double x, double y)
-{
-   TMarker *m1 = new TMarker(x, y, 5);
-   m1->SetMarkerSize(0.3);
-
-   int color=kBlack;
-   if (iturn==1) color=kRed;
-   if (iturn==2) color=kBlue;
-   if (iturn==3) color=kCyan;
-   if (iturn==4) color=kMagenta;
-   if (iturn>=5) color=kGreen;
+   if (iturn==0) color=kRed;
+   if (iturn==1) color=kBlue;
+   if (iturn==2) color=kCyan;
+   if (iturn==3) color=kMagenta;
+   if (iturn==4) color=kGreen;
+   if (iturn>=5) color=kBlack;
    m1->SetMarkerColor(color);
 
    return m1;
@@ -377,12 +362,12 @@ int main(int argc, char** argv)
          double w_u1 = 2.0*w_x1/r2;
          double w_v1 = 2.0*w_y1/r2;
 
-         TMarker* m1 = getMarker(ilayer, iturn, mcPos.X(), mcPos.Y());
-         TMarker* m2 = getMarker(ilayer, iturn, w_x1, w_y1);
-         TMarker* m3 = getMarker(ilayer, iturn, w_u1, w_v1);
-         TMarker* m4 = getMarker(ilayer, iturn, w_x, w_y);
-         TMarker* m5 = getMarker(ilayer, iturn, ihit, mcPos.Z());
-         TMarker* m6 = getMarker(ilayer, iturn, ihit, mcMom.Z()*1000); // GeV -> MeV
+         TMarker* m1 = getMarker(8, ilayer, iturn, mcPos.X(), mcPos.Y());
+         TMarker* m2 = getMarker(8, ilayer, iturn, w_x1, w_y1);
+         TMarker* m3 = getMarker(8, ilayer, iturn, w_u1, w_v1);
+         TMarker* m4 = getMarker(8, ilayer, iturn, w_x, w_y);
+         TMarker* m5 = getMarker(8, ilayer, iturn, ihit, mcPos.Z());
+         TMarker* m6 = getMarker(8, ilayer, iturn, ihit, mcMom.Z()*1000); // GeV -> MeV
 
          c1.cd(1); m1->Draw();
          c1.cd(2); m2->Draw();
@@ -410,6 +395,7 @@ int main(int argc, char** argv)
 
       c2.add_h2d(0, "h100", "Wire XY@endplate/MCZ", 100, -100, 100, 100, -100, 100);
 
+
       c2.h2d[0]->Reset();
 
       c2.draw_hists();
@@ -423,11 +409,11 @@ int main(int argc, char** argv)
          double xmc, ymc, zmc;
          inROOT.getWirePosAtEndPlates(ihit, x1, y1, z1, x2, y2, z2);
          inROOT.getWirePosAtHitPoint(ihit, xmc, ymc, zmc);
-         TMarker* m1 = getMarker(ilayer, iturn, x1, y1);
-         TMarker* m2 = getMarkerMC(ilayer, iturn, xmc, ymc);
+         TMarker* m1 = getMarker(8, ilayer, iturn, x1, y1);
+         //TMarker* m2 = getMarker(5, ilayer, iturn, xmc, ymc);
          c2.cd(1); 
          m1->Draw();
-         m2->Draw();
+         //m2->Draw();
       }
       //c2.cd(2); hough.get_line()->Draw("same");
       c2.print(Form("pdf/hough/%05d.pdf", iev));

@@ -402,6 +402,7 @@ int main(int argc, char** argv)
             sprintf(title, "iev %d z1 %5.0f z2 %5.0f", iev, z1, z2);
             c2.update_title_prefix(title);
             c2.draw_hists();
+            c2.cd(1); draw_radius(inROOT.getConfig());
 
             hits.calc_xyz(inROOT.getConfig(), z1, z2);
             //hough.fit(hits, iev, z1, z2);
@@ -432,7 +433,6 @@ int main(int argc, char** argv)
                c2.cd(1); m1->Draw();
                c2.cd(2); m2->Draw();
             }
-            c2.cd(1); draw_radius(inROOT.getConfig());
             //c2.cd(2); hough.get_line()->Draw("same");
             c2.cd(3); c2.h1d[0]->Draw();
             c2.cd(4); hough.h2->Draw("colz");

@@ -17,6 +17,7 @@ struct MyHits
    int ilayer[10000];
    int icell[10000];
    int iturn[10000];
+   double rdrift[10000];
    double xhits[10000];
    double yhits[10000];
    double zhits[10000];
@@ -36,11 +37,12 @@ struct MyHits
    {
       num_hits = 0;
    };
-   void add_hit(int _ilayer, int _icell, int _iturn)
+   void add_hit(int _ilayer, int _icell, int _iturn, double _rdrift)
    {
       ilayer[num_hits] = _ilayer;
       icell[num_hits] = _icell;
       iturn[num_hits] = _iturn;
+      rdrift[num_hits] = _rdrift;
       num_hits++;
    };
    void calc_xyz(struct config* config, double _z1, double _z2)
@@ -170,6 +172,22 @@ TMarker* getMarker(int marker_style, int ilayer, int iturn, double x, double y)
    m1->SetMarkerColor(color);
 
    return m1;
+}
+
+TEllipse* getEllipse(int ilayer, int iturn, double x, double y, double r)
+{
+   TEllipse *e1 = new TEllipse(x, y, r);
+   e1->SetFillStyle(0);
+   int color=kBlack;
+   if (iturn==0) color=kRed;
+   if (iturn==1) color=kBlue;
+   if (iturn==2) color=kCyan;
+   if (iturn==3) color=kMagenta;
+   if (iturn==4) color=kGreen;
+   if (iturn>=5) color=kBlack;
+   e1->SetLineColor(color);
+
+   return e1;
 }
 
 struct Canvas
@@ -317,6 +335,7 @@ int main(int argc, char** argv)
          int ilayer = inROOT.getIlayer(ihit);
          int icell = inROOT.getIcell(ihit);
          int iturn = inROOT.getIturn(ihit);
+         double rdrift = inROOT.getDriftDistance(iev, ihit);
 //         if (iturn!=0) continue; 
 //         printf("ilayer %d icell %d iturn %d\n", ilayer, icell, iturn);
 
@@ -324,7 +343,7 @@ int main(int argc, char** argv)
          inROOT.getWirePosAtEndPlates(ihit, w_x1, w_y1, w_z1, w_x2, w_y2, w_z2);
          inROOT.getWirePosAtHitPoint(ihit, w_x, w_y, w_z);
 
-         hits.add_hit(ilayer, icell, iturn);
+         hits.add_hit(ilayer, icell, iturn, rdrift);
 
          double r2 = w_x1*w_x1 + w_y1*w_y1;
          double w_u1 = 2.0*w_x1/r2;
@@ -355,13 +374,16 @@ int main(int argc, char** argv)
          int ilayer = hits.ilayer[ihit];
          int icell = hits.icell[ihit];
          int iturn = hits.iturn[ihit];
+         double rdrift = hits.rdrift[ihit];
          double x1, y1, z1;
          double x2, y2, z2;
          //printf("ilayer %d icell %d iturn %d\n", ilayer, icell, iturn);
          inROOT.getWirePosAtEndPlates(ihit, x1, y1, z1, x2, y2, z2);
          TMarker* m1 = getMarker(8, ilayer, iturn, x1, y1);
+         TEllipse* e1 = getEllipse(ilayer, iturn, x1, y1, rdrift);
          c2.cd(1); 
          m1->Draw();
+         e1->Draw();
       }
       c2.print(Form("pdf/endplate_%05d.pdf", iev));
 
@@ -381,12 +403,15 @@ int main(int argc, char** argv)
          int ilayer = hits.ilayer[ihit];
          int icell = hits.icell[ihit];
          int iturn = hits.iturn[ihit];
+         double rdrift = hits.rdrift[ihit];
          double xmc, ymc, zmc;
          printf("ilayer %d icell %d iturn %d\n", ilayer, icell, iturn);
          inROOT.getWirePosAtHitPoint(ihit, xmc, ymc, zmc);
          TMarker* m1 = getMarker(5, ilayer, iturn, xmc, ymc);
+         TEllipse* e1 = getEllipse(ilayer, iturn, xmc, ymc, rdrift);
          c3.cd(1); 
          m1->Draw();
+         e1->Draw();
       }
       c3.print(Form("pdf/mcz_%05d.pdf", iev));
    }

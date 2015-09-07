@@ -159,6 +159,19 @@ TMarker* getMarker(int ilayer, int iturn, double x, double y)
    return m1;
 }
 
+TMarker* getMarkerMC(int ilayer, int iturn, double x, double y)
+{
+   TMarker *m1 = new TMarker(x, y, 8);
+   m1->SetMarkerSize(0.3);
+
+   if (ilayer%2==1) m1->SetMarkerColor(kRed);
+   if (ilayer%2==0) m1->SetMarkerColor(kBlue);
+
+   if (iturn==0) m1->SetMarkerStyle(5); // x
+
+   return m1;
+}
+
 struct Canvas
 {
    TCanvas* c1;
@@ -337,6 +350,7 @@ int main(int argc, char** argv)
          int icell = inROOT.getIcell(ihit);
          int iturn = inROOT.getIturn(ihit);
          if (iturn!=0) continue; 
+         printf("ilayer %d icell %d iturn %d\n", ilayer, icell, iturn);
 
          inROOT.getPosMom(ihit, mcPos, mcMom);
          inROOT.getWirePosAtEndPlates(ihit, w_x1, w_y1, w_z1, w_x2, w_y2, w_z2);
@@ -377,71 +391,31 @@ int main(int argc, char** argv)
       c1.print(Form("pdf/%05d.pdf", iev));
 
       Canvas c2;
-      c2.init(4,1);
+      c2.init(1,1);
 
-      c2.add_h2d(0,"h101", "Wire XY@z", 100, -100, 100, 100, -100, 100);
-      c2.add_h2d(1,"h102", "Conf UV@z", 100, -1e-1, 1e-1, 100, -1e-1, 1e-1);
-      c2.add_h1d(2,"h103", "Diff", 100, -0.005, 0.005);
+      c2.add_h1d(0,"h103", "Diff", 100, -0.005, 0.005);
 
-      struct Hough hough;
-      int max_num = 0;
-      double max_z1 = 0;
-      double max_z2 = 0;
+      c2.h1d[0]->Reset();
 
-      double min_rms = 1e10;
-      double min_z1 = 0;
-      double min_z2 = 0;
-      for (int iz1=0; iz1<20; iz1++) {
-         for (int iz2=0; iz2<20; iz2++) {
+      c2.draw_hists();
+      c2.cd(1); draw_radius(inROOT.getConfig());
 
-            double z1 = iz1*10 - 100.0;
-            double z2 = iz2*10 - 100.0;
-
-            c2.h1d[0]->Reset();
-
-            sprintf(title, "iev %d z1 %5.0f z2 %5.0f", iev, z1, z2);
-            c2.update_title_prefix(title);
-            c2.draw_hists();
-            c2.cd(1); draw_radius(inROOT.getConfig());
-
-            hits.calc_xyz(inROOT.getConfig(), z1, z2);
-            //hough.fit(hits, iev, z1, z2);
-            hough.transform(hits);
-            double diff[1000];
-            hough.calc_diff(hits, diff);
-            for (int ihit=0; ihit<hough.num_hits; ihit++) c2.h1d[0]->Fill(diff[ihit]);
-            //printf("## iev %d z1 %f z2 %f RMS %f\n", iev, z1, z2, c2.h1d[0]->GetRMS());
-            double rms = c2.h1d[0]->GetRMS();
-            if (min_rms > rms) {
-               min_rms = rms;
-               min_z1 = z1;
-               min_z2 = z2;
-            }
-            //if (hough.num_inside > max_num) {
-            //   max_num = hough.num_inside;
-            //   max_z1 = z1;
-            //   max_z2 = z2;
-            //}
-            //hough.print(iev);
-
-            for (int ihit=0; ihit<hits.num_hits; ihit++) {
-               int ilayer = hits.ilayer[ihit];
-               int iturn = hits.iturn[ihit];
-               TMarker* m1 = getMarker(ilayer, iturn, hits.xhits[ihit], hits.yhits[ihit]);
-               TMarker* m2 = getMarker(ilayer, iturn, hits.uhits[ihit], hits.vhits[ihit]);
-
-               c2.cd(1); m1->Draw();
-               c2.cd(2); m2->Draw();
-            }
-            //c2.cd(2); hough.get_line()->Draw("same");
-            c2.cd(3); c2.h1d[0]->Draw();
-            c2.cd(4); hough.h2->Draw("colz");
-            c2.print(Form("pdf/hough/%05d-%d-%d.pdf", iev,iz1,iz2));
-         }
+      for (int ihit=0; ihit<hits.num_hits; ihit++) {
+         int ilayer = hits.ilayer[ihit];
+         int iturn = hits.iturn[ihit];
+         double x1, y1, z1;
+         double x2, y2, z2;
+         double xmc, ymc, zmc;
+         inROOT.getWirePosAtEndPlates(ihit, x1, y1, z1, x2, y2, z2);
+         inROOT.getWirePosAtHitPoint(ihit, xmc, ymc, zmc);
+         TMarker* m1 = getMarker(ilayer, iturn, x1, y1);
+         TMarker* m2 = getMarkerMC(ilayer, iturn, xmc, ymc);
+         c2.cd(1); 
+         m1->Draw();
+         m2->Draw();
       }
-      //printf("iev %d num_hits %d max_num %d max_z1 %f max_z2 %f\n", iev, hough.num_hits, max_num, max_z1, max_z2);
-      printf("iev %d num_hits %d min_rms %f min_z1 %f min_z2 %f\n", iev, hough.num_hits, min_rms, min_z1, min_z2);
-
+      //c2.cd(2); hough.get_line()->Draw("same");
+      c2.print(Form("pdf/hough/%05d.pdf", iev));
    }
    return 0;
-   }
+}

@@ -147,10 +147,9 @@ TMarker* getMarker(int ilayer, int iturn, double x, double y)
 {
    TMarker *m1 = new TMarker(x, y, 8);
    m1->SetMarkerSize(0.3);
-   m1->SetMarkerColor(1);
 
-   if (ilayer%2==1) m1->SetMarkerColor(1);
-   if (ilayer%2==0) m1->SetMarkerColor(2);
+   if (ilayer%2==1) m1->SetMarkerColor(kRed);
+   if (ilayer%2==0) m1->SetMarkerColor(kBlue);
 
    if (iturn==0) m1->SetMarkerStyle(8); // ●
    if (iturn==1) m1->SetMarkerStyle(5); // x
@@ -247,11 +246,12 @@ struct Canvas
 void draw_radius(struct config* config)
 {
    for (int ilayer=0; ilayer<config->sense_layer_size; ilayer++) {
+      if (ilayer%2==0) continue;
       double r = config_get_layer_radius(config, ilayer, LAYER_TYPE_SENSE, 0);
       TEllipse* e = new TEllipse(0,0,r);
       e->SetFillStyle(0);
       e->SetLineWidth(1);
-      e->SetLineStyle(2);
+      e->SetLineStyle(1);
       e->Draw();
    }
 }

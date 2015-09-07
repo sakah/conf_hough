@@ -250,6 +250,8 @@ void draw_radius(struct config* config)
       double r = config_get_layer_radius(config, ilayer, LAYER_TYPE_SENSE, 0);
       TEllipse* e = new TEllipse(0,0,r);
       e->SetFillStyle(0);
+      e->SetLineWidth(1);
+      e->SetLineStyle(2);
       e->Draw();
    }
 }
